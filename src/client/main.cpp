@@ -13,6 +13,7 @@ void testSFML() {
 #include <client.h>
 #include <cstring>
 #include <random>
+#include <X11/Xlib.h>
 
 using namespace std;
 using namespace state;
@@ -21,7 +22,7 @@ using namespace client;
 
 int main(int argc,char* argv[])
 {   
-
+    XInitThreads();
     srand(time(NULL));
     Test test;
     if (argc > 1) {

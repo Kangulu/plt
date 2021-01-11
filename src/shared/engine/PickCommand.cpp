@@ -66,6 +66,7 @@ Json::Value PickCommand::serialize (){
 }
 
 void PickCommand::unserialize (Json::Value value){
+    this->id = (CommandID) value["id"].asUInt();
     this->riverPosition = value["riverPosition"].asUInt();
     this->cardPosition = value["cardPosition"].asUInt();
     this->setPlayerName(value["playerName"].asString());

@@ -4,6 +4,9 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <SFML/Graphics.hpp>
+#include <thread>
+#include <functional>
+
 using namespace client;
 using namespace state;
 using namespace render;
@@ -18,6 +21,7 @@ void Test::state(){
 void Test::render(){
     shared_ptr<State> state = make_shared<State>(10,"res/cardsData/");
     shared_ptr<StateRenderer> stateRenderer = make_shared<StateRenderer>();
+    state->registerObserver(stateRenderer);
 
     while (stateRenderer->isOpen())
     {
@@ -38,6 +42,7 @@ void Test::render(){
 void Test::engine(){
     shared_ptr<State> state = make_shared<State>(20,"res/cardsData/");
     shared_ptr<StateRenderer> stateRenderer = make_shared<StateRenderer>();
+    state->registerObserver(stateRenderer);
     std::vector<std::shared_ptr<Actor>> actors;
     shared_ptr<Engine> engine = make_shared<Engine>(actors,state);
 
@@ -69,6 +74,7 @@ void Test::engine(){
 void Test::random_ai(){
     shared_ptr<State> state = make_shared<State>(200,"res/cardsData/");
     shared_ptr<StateRenderer> stateRenderer = make_shared<StateRenderer>();
+    state->registerObserver(stateRenderer);
     std::vector<std::shared_ptr<Actor>> actors;
     actors.push_back(make_shared<RandomAI>(state->players[0]));
     actors.push_back(make_shared<RandomAI>(state->players[1]));
@@ -99,61 +105,18 @@ void Test::random_ai(){
 
 void Test::player_vs_ai(){
     shared_ptr<State> state = make_shared<State>(200,"res/cardsData/");
-    shared_ptr<StateRenderer> stateRenderer = make_shared<StateRenderer>();
     std::vector<std::shared_ptr<Actor>> actors;
-    shared_ptr<Human> _human = make_shared<Human>(state->players[0]);
-    actors.push_back(_human);
+    shared_ptr<Human> human = make_shared<Human>(state->players[0]);
+    actors.push_back(human);
+
+    std::shared_ptr<Client> client = make_shared<Client>(human,state);
+    client->start();
+
     actors.push_back(make_shared<RandomAI>(state->players[1]));
     shared_ptr<Engine> engine = make_shared<Engine>(actors,state);
-
-    while (stateRenderer->isOpen())
-    {
-        // Process events
-        sf::Event event;
-
-        stateRenderer->update(state);
-        while (stateRenderer->pollEvent(event))
-        {
-            // Close window: exit
-            if (event.type == sf::Event::Closed){
-                stateRenderer->close();
-            }
-            if(event.type == sf::Event::KeyPressed)
-            {
-                if(event.key.code == sf::Keyboard::Space){
-                    engine->step();
-                }
-            }
-            
-            if (event.type == sf::Event::MouseButtonPressed){
-		        vector<shared_ptr<render::RiverRenderer>> _riverRenderers = stateRenderer->riverRenderers;
-
-                // Loop on rivers:
-                for(uint riverpos = 0; riverpos < _riverRenderers.size(); riverpos++){
-                    shared_ptr<render::RiverRenderer> _riverRenderer = _riverRenderers[riverpos];
-                    // _riverRenderer is current river.
-                    
-                    // Loop on cards (in current river):
-                    for(uint cardpos = 0; cardpos < _riverRenderer->cards.size(); cardpos++){
-                        sf::Sprite _sprite = _riverRenderer->cards[cardpos]->sprite;
-                        sf::Vector2f _cardPosition = _riverRenderer->cards[cardpos]->cardPosition;
-                        sf::Vector2f _cardDimension = _riverRenderer->cards[cardpos]->cardDimension;
-
-                        bool x_condition = event.mouseButton.x >= _cardPosition.x && event.mouseButton.x <= _cardPosition.x+_cardDimension.x;
-                        bool y_condition = event.mouseButton.y >= _cardPosition.y && event.mouseButton.y <= _cardPosition.y+_cardDimension.y;
-
-                        if (x_condition && y_condition){
-                            cout << "hit" << endl;
-                            // Clicked on that card !
-                            std::shared_ptr<PickCommand> command = std::make_shared<engine::PickCommand>(riverpos, cardpos, _human->player->name);
-                            _human->commandBuffer = command;
-
-                            // Debug:
-                        }
-                    }
-                }                
-            }
-        }
+    
+    while(state->winnerIndex == -1){
+        engine->step();
     }
     engine->saveReplay("replay.json");
 
@@ -162,6 +125,7 @@ void Test::player_vs_ai(){
 void Test::heuristic_ai(){
     shared_ptr<State> state = make_shared<State>(200,"res/cardsData/");
     shared_ptr<StateRenderer> stateRenderer = make_shared<StateRenderer>();
+    state->registerObserver(stateRenderer);
     std::vector<std::shared_ptr<Actor>> actors;
     actors.push_back(make_shared<HeuristicAI>(state->players[0]));
     actors.push_back(make_shared<HeuristicAI>(state->players[1]));
@@ -193,6 +157,7 @@ void Test::heuristic_ai(){
 void Test::deep_ai(){
     shared_ptr<State> state = make_shared<State>(200,"res/cardsData/");
     shared_ptr<StateRenderer> stateRenderer = make_shared<StateRenderer>();
+    state->registerObserver(stateRenderer);
     std::vector<std::shared_ptr<Actor>> actors;
     actors.push_back(make_shared<RandomAI>(state->players[0]));
     actors.push_back(make_shared<DeepAI>(state->players[1]));
@@ -274,7 +239,6 @@ void Test::deep_ai_performance(){
 }
 
 void Test::replay (std::string filename){
-    shared_ptr<StateRenderer> stateRenderer = make_shared<StateRenderer>();
     std::vector<std::shared_ptr<Actor>> actors;
     shared_ptr<Engine> engine = make_shared<Engine>(actors,nullptr);
     
@@ -282,6 +246,9 @@ void Test::replay (std::string filename){
         return;
     }
     std::shared_ptr<State> state = engine->state;
+
+    shared_ptr<StateRenderer> stateRenderer = make_shared<StateRenderer>();
+    state->registerObserver(stateRenderer);
 
     while(stateRenderer->isOpen())
     {

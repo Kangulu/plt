@@ -65,13 +65,29 @@ each player will be an ai that pick a decision at random among possible decision
 bin/client heuristic_ai
 ```
 
+You can test the deep ai :
+
+The player 1 will be a random ai and the player 2 will be a deep ai who takes decision by exploring a decision tree.
+```
+bin/client deep_ai
+```
+
 You can compare the heuristic ai to the random_ai:
 
 The heuristic ai will play 1000 times against the random one in game of 200 turns and a winrate will be printed.
 
-In our experiance the winrate is about 63.1%.
+In our experience the winrate is about 98.5%.
 ```
 bin/client heuristic_ai_performance
+```
+
+You can compare the heuristic ai to the random_ai:
+
+The deep ai will play 100 times against the random one in game of 200 turns and a winrate will be printed.
+
+You can expect a 100% win rate.
+```
+bin/client deep_ai_performance
 ```
 
 You can test the replay :
@@ -81,6 +97,13 @@ At the end of a game such as a game played by ai, a replay of the game is stored
 You can simply replay the game that has been played.
 ```
 bin/client replay replay.json
+```
+
+You can play the game versus an ai :
+
+Playing yourself by clicking on cards versus a random_ai is possible make sure to click a valid card before pressing space otherwise a seg fault is what you'll get.
+```
+bin/client player_vs_ai
 ```
 
 

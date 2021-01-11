@@ -31,6 +31,8 @@ State::State (int remainingTurns,std::string ressourcespath){
 
 State::State (shared_ptr<State> state){
     this->remainingTurns = state->remainingTurns;
+	this->activePlayerIndex = state->activePlayerIndex;
+	this->winnerIndex = state->winnerIndex;
 	
     for(uint i =0 ; i<state->players.size();i++){
     	shared_ptr<Player> player = make_shared<Player>(state->players[i]);
@@ -52,6 +54,8 @@ void State::endTurn (){
 	if(remainingTurns >0){
 		remainingTurns--;
 		refreshActivePlayer();
+
+    	players[activePlayerIndex]->earnIncome();
 	}
 	else{
 		if(players[0]->ressources->victoryPoint > players[1]->ressources->victoryPoint){
@@ -102,3 +106,15 @@ void State::unserialize(Json::Value value){
 	}
 }
 
+
+void State::registerObserver (std::shared_ptr<Observer> observer){
+    this->observers.push_back(observer);
+}
+
+void State::notifyObservers (){
+    for(auto it = observers.begin();it != observers.end();it++){
+        std::shared_ptr<Observer> observer = *it;
+
+        observer->update(this->shared_from_this());
+    }
+}

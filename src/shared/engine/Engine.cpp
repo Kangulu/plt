@@ -25,8 +25,6 @@ void Engine::step (){
         state->endTurn();
         return;
     }
-
-    activePlayer->earnIncome();
             
     for(uint j =0;j<actors.size();j++){
                 
@@ -34,7 +32,6 @@ void Engine::step (){
         actor->updateState(state);
 
         if(actor->player == activePlayer){
-            
             shared_ptr<Command> command;
                     
             do{
@@ -51,7 +48,6 @@ void Engine::step (){
 
 void Engine::saveReplay (std::string filename){
     Json::Value replay;
-    
     for(uint i = 0;i<commandHistoric.size();i++){
         replay["commands"][i] = commandHistoric[i]->serialize();
     }

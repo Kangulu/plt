@@ -76,7 +76,7 @@ You can compare the heuristic ai to the random_ai:
 
 The heuristic ai will play 1000 times against the random one in game of 200 turns and a winrate will be printed.
 
-In our experiance the winrate is about 63.1%.
+In our experiance the winrate is about 98.5%.
 ```
 bin/client heuristic_ai_performance
 ```

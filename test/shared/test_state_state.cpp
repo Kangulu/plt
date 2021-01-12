@@ -3,9 +3,12 @@
 #include <iostream>
 #include <random>
 #include "../../src/shared/state.h"
+#include "../../src/client/render/StateRenderer.h"
+
 
 using namespace state;
 using namespace std;
+using namespace render;
 
 
 BOOST_AUTO_TEST_SUITE(state_State)
@@ -56,4 +59,14 @@ BOOST_AUTO_TEST_CASE(State_endOfTurn){
 	BOOST_TEST(state->winnerIndex == 1);
 }
 
+
+//test unitaire registerObserver
+BOOST_AUTO_TEST_CASE(State_registerObserver){
+	shared_ptr<State> state = make_shared<State>(1,"../../../res/cardsData/");
+	shared_ptr<StateRenderer> stateRenderer = make_shared<StateRenderer>();
+	state->registerObserver(stateRenderer);
+	BOOST_TEST(state->observers.back() == stateRenderer);
+}
+
 BOOST_AUTO_TEST_SUITE_END();
+

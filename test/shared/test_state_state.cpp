@@ -3,9 +3,12 @@
 #include <iostream>
 #include <random>
 #include "../../src/shared/state.h"
+#include "../../src/client/render/StateRenderer.h"
+
 
 using namespace state;
 using namespace std;
+using namespace render;
 
 
 BOOST_AUTO_TEST_SUITE(state_State)
@@ -56,4 +59,29 @@ BOOST_AUTO_TEST_CASE(State_endOfTurn){
 	BOOST_TEST(state->winnerIndex == 1);
 }
 
+
+//test unitaire registerObserver
+BOOST_AUTO_TEST_CASE(State_registerObserver){
+	shared_ptr<State> state = make_shared<State>(1,"../../../res/cardsData/");
+	shared_ptr<StateRenderer> stateRenderer = make_shared<StateRenderer>();
+	state->registerObserver(stateRenderer);
+	BOOST_TEST(state->observers.back() == stateRenderer);
+}
+
+//test unitaire notifyObservers
+BOOST_AUTO_TEST_CASE(State_notifyObservers){
+	shared_ptr<State> state1 = make_shared<State>(1,"../../../res/cardsData/");
+	shared_ptr<State> state2 = make_shared<State>(1,"../../../res/cardsData/");
+
+	shared_ptr<StateRenderer> stateRenderer = make_shared<StateRenderer>();
+
+	state1->registerObserver(stateRenderer); 
+	state2->registerObserver(stateRenderer); 
+
+	state1->notifyObservers();
+	state2->observers.back()->update(state2->shared_from_this());
+	BOOST_TEST(state1->observers.back() == state2->observers.back());
+}
+
 BOOST_AUTO_TEST_SUITE_END();
+

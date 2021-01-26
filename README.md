@@ -76,7 +76,7 @@ You can compare the heuristic ai to the random_ai:
 
 The heuristic ai will play 1000 times against the random one in game of 200 turns and a winrate will be printed.
 
-In our experiance the winrate is about 63.1%.
+In our experience the winrate is about 98.5%.
 ```
 bin/client heuristic_ai_performance
 ```
@@ -117,9 +117,9 @@ Keep in mind that you need 2 clients to play.
 
 ## Authors
 
-* [**Maxime Marroufin**](https://github.com/Marroufin)
+* [**Maxime Marroufin**](https://github.com/Kangulu)
 * [**Quentin Chhean**](https://github.com/quenchhe)
 * [**Abinaya Mathibala**](https://github.com/AbinayaM-coder)
 * [**Alban Benmouffek**](https://github.com/sonibla)
 
-See also the list of [contributors](https://github.com/sonibla/plt/contributors) who participated in this project.
+See also the list of [contributors](https://github.com/Kangulu/plt/contributors) who participated in this project.
